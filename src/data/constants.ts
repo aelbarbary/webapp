@@ -1,0 +1,11 @@
+export const constants = Object.freeze({
+    STATUS_NEW: 'N',
+    STATUS_VERIFIED: 'V',
+    STATUS_ADMIN_APPROVE: 'AA',
+    STATUS_ADMIN_DENY: 'AD',
+    STATUS_SUSPENDED: 'S',
+    MATCH_STATUS_APPROVED: 'A',
+    MATCH_STATUS_REJECTED: 'R',
+    MATCH_STATUS_PENDING: 'P',
+    // MATCH_STATUS_EXPIRED: 'E',
+})
