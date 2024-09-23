@@ -1,12 +1,11 @@
 import React from 'react'
 import { Grid, useTheme } from '@mui/material'
 
-export default function Home() {
+export default function Upload() {
     window.scrollTo(0, 0)
     const theme = useTheme()
     return (
         <Grid  sx={{
-            m: 0,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -16,7 +15,7 @@ export default function Home() {
             height: '900px',
             width: '100%'
           }}>
-            <h1>Home</h1>
+            <h1>Upload</h1>
         </Grid>
     )
 }

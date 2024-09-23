@@ -8,7 +8,6 @@ export default function History() {
     const theme = useTheme()
     return (
         <Grid  sx={{
-            py: 4,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -16,8 +15,9 @@ export default function History() {
             bgcolor: theme.palette.background.default, // Example usage of the theme
             color: theme.palette.text.primary,
             height: '900px',
+            width: '100%'
           }}>
-            <h1>Orders</h1>
+            <h1>History</h1>
         </Grid>
     )
 }
