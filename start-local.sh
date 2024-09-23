@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set the file path
-file_path="/Users/admin/Documents/code/nozolan/marriage/marriage-api/src/settings/.env"
+file_path="/Users/admin/Documents/code/ai/marriage/marriage-api/src/settings/.env"
 
 
 if [ -f "$file_path" ]; then
@@ -12,11 +12,11 @@ else
     echo "Error: File not found at $file_path"
 fi
 
-cd /Users/admin/Documents/code/nozolan/marriage/marriage-api/
+cd /Users/admin/Documents/code/ai/marriage/marriage-api/
 chmod +x run.sh  
 ./run.sh &
 
-cd /Users/admin/Documents/code/nozolan/marriage/marriage-website/
+cd /Users/admin/Documents/code/ai/marriage/marriage-website/
 npm start
 
 

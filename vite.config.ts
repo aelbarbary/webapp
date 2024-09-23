@@ -12,9 +12,9 @@ export default defineConfig({
     },
     includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
     manifest: {
-      name: 'Nozolan Marraige',
-      short_name: 'Nozolan Marraige',
-      description: "Nozolan is a platform that helps Muslims find the love of their lives. We believe in the power of faith, which is why we're committed to helping our users find partners who share their values.",
+      name: 'AI',
+      short_name: 'Ai',
+      description: "",
       theme_color: '#e10098',
       icons: [
         {
