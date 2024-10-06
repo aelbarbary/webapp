@@ -131,7 +131,6 @@ export default function Search() {
                 display: 'flex',
                 flexDirection: 'column',
                 padding: 8,
-                backgroundColor: 'black',
             }}
         >
             <Typography variant="h5" align="center" gutterBottom>
@@ -151,12 +150,12 @@ export default function Search() {
                         <ListItemText
                             primary={
                                 message.type === 'component' ? (
-                                    message.content // Directly render the component like TypingIndicator
+                                    message.content
                                 ) : (
                                     <RenderedMessageContent
                                         content={message.content as string}
                                     />
-                                ) // Use RenderedMessageContent for strings
+                                )
                             }
                             style={{
                                 backgroundColor:

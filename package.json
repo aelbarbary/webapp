@@ -3,6 +3,7 @@
     "version": "1.0.1",
     "private": true,
     "dependencies": {
+        "@iconify/react": "^5.0.2",
         "@mui/icons-material": "^6",
         "@mui/material": "^6",
         "@mui/system": "^6",
