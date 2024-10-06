@@ -1,97 +1,207 @@
-import React, { useState } from 'react';
-import { Grid, TextField, Button, useTheme, Typography, Box } from '@mui/material';
+import React, { ReactNode, useEffect, useRef, useState } from 'react';
+import {
+    Grid,
+    TextField,
+    Button,
+    useTheme,
+    Typography,
+    Box,
+    Icon,
+    Paper,
+    List,
+    ListItem,
+    ListItemText,
+} from '@mui/material';
 import axios from 'axios';
+import RenderedMessageContent from './RenderedMessageContent';
+import TypingIndicator from './TypingIndicator';
+
+interface Message {
+    content: string | ReactNode;
+    sender: 'user' | 'bot';
+    type?: 'string' | 'component';
+}
 
 export default function Search() {
-    window.scrollTo(0, 0);
+    const [question, setQuestion] = useState<string>('');
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
+    const endOfMessagesRef = useRef<HTMLDivElement>(null);
     const theme = useTheme();
-    
-    const [queries, setQueries] = useState<{ query: string; response: string }[]>([]);
-    const [query, setQuery] = useState('');
 
-    const handleSearch = async () => {
-        if (query.trim()) {
-            try {
-                const response = await axios.post('http://localhost:8000/api/v1/answer/', {
-                    prompt: query.trim(),
-                });
+    const handleSend = async () => {
+        if (!question.trim()) return;
 
-                setQueries((prevQueries) => [
-                    ...prevQueries, 
-                    { query: query.trim(), response: response.data.response }
-                ]);
-                setQuery(''); 
-            } catch (error) {
-                console.error('Error fetching data:', error);
+        const userMessage: Message = {
+            type: 'string',
+            content: question,
+            sender: 'user',
+        };
+        setMessages(prevMessages => [...prevMessages, userMessage]);
+        setLoading(true);
+        setMessages(prevMessages => {
+            return [
+                ...prevMessages,
+                {
+                    type: 'component',
+                    content: <TypingIndicator />,
+                    sender: 'bot',
+                },
+            ];
+        });
+
+        let accumulatedAnswer = '';
+
+        try {
+            const responseStream = await fetch(
+                'http://localhost:8000/api/v1/answer/',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ prompt: question }),
+                }
+            );
+
+            const reader = responseStream.body?.getReader();
+            const decoder = new TextDecoder('utf-8');
+
+            while (true) {
+                const { done, value }: any = await reader?.read();
+                if (done) break;
+
+                const chunk = decoder.decode(value, { stream: true });
+                const chunks = chunk.split('\n');
+
+                for (const line of chunks) {
+                    if (line.trim()) {
+                        try {
+                            const data = JSON.parse(line);
+                            if (data.answer) {
+                                accumulatedAnswer += data.answer;
+
+                                setMessages(prevMessages => {
+                                    const updatedMessages = [...prevMessages];
+                                    updatedMessages.pop(); // Remove the typing indicator
+                                    updatedMessages.push({
+                                        type: 'string',
+                                        content: accumulatedAnswer,
+                                        sender: 'bot',
+                                    });
+                                    return updatedMessages;
+                                });
+                            }
+                        } catch (e) {
+                            console.error('Error parsing JSON:', e);
+                        }
+                    }
+                }
             }
+        } catch (error) {
+            setMessages(prevMessages => {
+                const updatedMessages = [...prevMessages];
+                updatedMessages.pop(); // Remove the loading message
+                return [
+                    ...updatedMessages,
+                    {
+                        type: 'string',
+                        content:
+                            'Error connecting to the server. Please try again.',
+                        sender: 'bot',
+                    },
+                ];
+            });
+        } finally {
+            setLoading(false);
+            setQuestion('');
         }
     };
 
+    useEffect(() => {
+        if (endOfMessagesRef.current) {
+            endOfMessagesRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [messages]);
+
     return (
-        <Grid 
-            container
-            direction="column"
-            alignItems="center"
-            justifyContent="flex-start"
+        <Paper
             sx={{
-                bgcolor: theme.palette.background.default,
-                color: theme.palette.text.primary,
                 height: '100vh',
-                padding: '20px',
-                overflowY: 'auto',
+                display: 'flex',
+                flexDirection: 'column',
+                padding: 8,
+                backgroundColor: 'black',
             }}
         >
-            <h1>Chat</h1>
-            <Box sx={{ width: '100%', maxWidth: '600px', mb: 2 }}>
-                {queries.map((item, index) => (
-                    <Box key={index} sx={{ mb: 1 }}>
-                        <Typography 
-                            variant="body1" 
-                            sx={{ 
-                                textAlign: 'right', 
-                                bgcolor: theme.palette.primary.dark, 
-                                color: 'white', 
-                                borderRadius: '8px', 
-                                padding: '10px', 
-                                marginTop: '5px', 
-                                mb: 1
-                                
+            <Typography variant="h5" align="center" gutterBottom>
+                What do you want to know/do?
+            </Typography>
+            <List sx={{ flexGrow: 1, overflowY: 'auto', marginBottom: '16px' }}>
+                {messages.map((message, index) => (
+                    <ListItem
+                        key={index}
+                        style={{
+                            justifyContent:
+                                message.sender === 'user'
+                                    ? 'flex-end'
+                                    : 'flex-start',
+                        }}
+                    >
+                        <ListItemText
+                            primary={
+                                message.type === 'component' ? (
+                                    message.content // Directly render the component like TypingIndicator
+                                ) : (
+                                    <RenderedMessageContent
+                                        content={message.content as string}
+                                    />
+                                ) // Use RenderedMessageContent for strings
+                            }
+                            style={{
+                                backgroundColor:
+                                    message.sender === 'user'
+                                        ? theme.palette.grey[700]
+                                        : theme.palette.grey[900],
+                                color:
+                                    message.sender === 'user'
+                                        ? 'white'
+                                        : 'white',
+                                borderRadius: '10px',
+                                padding: '8px',
+                                maxWidth: '70%',
+                                textAlign:
+                                    message.sender === 'user'
+                                        ? 'right'
+                                        : 'left',
                             }}
-                        >
-                            {item.query}
-                        </Typography>
-                        <b/>    
-                        <b/>    
-                        <Typography 
-                            variant="body1" 
-                            sx={{ 
-                                textAlign: 'left', 
-                                bgcolor: theme.palette.grey[600], 
-                                borderRadius: '8px', 
-                                padding: '10px', 
-                                
-                            }}
-                        >
-                            {item.response}
-                        </Typography>
-                        
-                        
-                    </Box>
+                        />
+                    </ListItem>
                 ))}
-            </Box>
+                <div ref={endOfMessagesRef} />
+            </List>
             <TextField
-                multiline
-                rows={4}
-                variant="outlined"
-                label="Enter your NLP query"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
                 fullWidth
-                sx={{ mb: 2 }}
+                variant="outlined"
+                label="Ask a question..."
+                value={question}
+                onChange={e => setQuestion(e.target.value)}
+                onKeyPress={e => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSend();
+                    }
+                }}
+                multiline
             />
-            <Button variant="contained" onClick={handleSearch} sx={{ mb: 1 }}>
-                Search
+            <Button
+                variant="contained"
+                color="primary"
+                onClick={handleSend}
+                style={{ marginTop: '10px' }}
+            >
+                {loading ? 'Sending...' : 'Send'}
             </Button>
-        </Grid>
+        </Paper>
     );
 }

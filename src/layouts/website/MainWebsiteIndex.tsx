@@ -10,35 +10,30 @@ import logo from '../../../src/static/img/logo.png';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { Outlet, useLocation } from 'react-router-dom';
 import SearchIcon from '@mui/icons-material/Search';
+import { height } from '@mui/system';
 
 const NAVIGATION: Navigation = [
-  { segment: 'search', title: 'Search', icon: <SearchIcon /> },
-  { segment: 'history', title: 'History', icon: <HistoryIcon /> },
-  { segment: 'upload', title: 'Upload', icon: <CloudUploadIcon /> },
+    { segment: 'search', title: 'Search', icon: <SearchIcon /> },
+    { segment: 'history', title: 'History', icon: <HistoryIcon /> },
+    { segment: 'upload', title: 'Upload', icon: <CloudUploadIcon /> },
 ];
 
-
 interface DemoProps {
-  window?: () => Window;
+    window?: () => Window;
 }
 
 export default function DashboardLayoutBranding(props: DemoProps) {
-  
-
-  return (
-    <AppProvider
-      navigation={NAVIGATION}
-      branding={{
-        logo: <img src={logo} alt="Ticketing" />,
-        title: 'Ticket AI',
-      }}
-      
-      // theme={demoTheme}
-      
-    >
-      <DashboardLayout>
-        <Outlet />
-      </DashboardLayout>
-    </AppProvider>
-  );
+    return (
+        <AppProvider
+            navigation={NAVIGATION}
+            branding={{
+                logo: <img src={logo} alt="Ticketing" />,
+                title: 'Ticket AI',
+            }}
+        >
+            <DashboardLayout>
+                <Outlet />
+            </DashboardLayout>
+        </AppProvider>
+    );
 }
