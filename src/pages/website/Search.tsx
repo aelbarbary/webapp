@@ -29,6 +29,55 @@ export default function Search() {
     const endOfMessagesRef = useRef<HTMLDivElement>(null);
     const theme = useTheme();
 
+    let accumulatedAnswer = '';
+
+    function processAnswer(answer: any) {
+        console.log(answer);
+        if (answer.type === 'urls') {
+            handleUrls(answer.data);
+        } else {
+            handleRegularAnswer(answer);
+        }
+    }
+
+    function handleUrls(urls: any) {
+        const formattedUrls = formatUrls(urls);
+        setMessages(prevMessages => {
+            const updatedMessages = [...prevMessages];
+            updatedMessages.push({
+                type: 'component', // Use 'html' type for rendering
+                content: formattedUrls, // Pass the formatted URLs
+                sender: 'bot',
+            });
+            return updatedMessages;
+        });
+    }
+
+    function formatUrls(urls: [any]) {
+        return urls.map(url => (
+            <div>
+                <a href={url} target="_blank" rel="noopener noreferrer">
+                    ${url}
+                </a>
+                <br />
+            </div>
+        ));
+    }
+
+    function handleRegularAnswer(answer: any) {
+        accumulatedAnswer += answer;
+        setMessages(prevMessages => {
+            const updatedMessages = [...prevMessages];
+            updatedMessages.pop(); // Remove the typing indicator
+            updatedMessages.push({
+                type: 'string',
+                content: accumulatedAnswer, // Pass the regular answer
+                sender: 'bot',
+            });
+            return updatedMessages;
+        });
+    }
+
     const handleSend = async () => {
         if (!question.trim()) return;
 
@@ -49,8 +98,6 @@ export default function Search() {
                 },
             ];
         });
-
-        let accumulatedAnswer = '';
 
         try {
             const responseStream = await fetch(
@@ -79,18 +126,20 @@ export default function Search() {
                         try {
                             const data = JSON.parse(line);
                             if (data.answer) {
-                                accumulatedAnswer += data.answer;
+                                processAnswer(data.answer);
 
-                                setMessages(prevMessages => {
-                                    const updatedMessages = [...prevMessages];
-                                    updatedMessages.pop(); // Remove the typing indicator
-                                    updatedMessages.push({
-                                        type: 'string',
-                                        content: accumulatedAnswer,
-                                        sender: 'bot',
-                                    });
-                                    return updatedMessages;
-                                });
+                                // accumulatedAnswer += data.answer;
+
+                                // setMessages(prevMessages => {
+                                //     const updatedMessages = [...prevMessages];
+                                //     updatedMessages.pop(); // Remove the typing indicator
+                                //     updatedMessages.push({
+                                //         type: 'string',
+                                //         content: accumulatedAnswer,
+                                //         sender: 'bot',
+                                //     });
+                                //     return updatedMessages;
+                                // });
                             }
                         } catch (e) {
                             console.error('Error parsing JSON:', e);
