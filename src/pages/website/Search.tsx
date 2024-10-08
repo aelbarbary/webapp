@@ -16,6 +16,8 @@ import axios from 'axios';
 import RenderedMessageContent from './RenderedMessageContent';
 import TypingIndicator from './TypingIndicator';
 
+const api_url = import.meta.env.VITE_API_URL;
+
 interface Message {
     content: string | ReactNode;
     sender: 'user' | 'bot';
@@ -100,16 +102,13 @@ export default function Search() {
         });
 
         try {
-            const responseStream = await fetch(
-                'http://localhost:8000/api/v1/answer/',
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ prompt: question }),
-                }
-            );
+            const responseStream = await fetch(api_url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ prompt: question }),
+            });
 
             const reader = responseStream.body?.getReader();
             const decoder = new TextDecoder('utf-8');
@@ -247,6 +246,7 @@ export default function Search() {
                 color="primary"
                 onClick={handleSend}
                 style={{ marginTop: '10px' }}
+                disabled={loading}
             >
                 {loading ? 'Sending...' : 'Send'}
             </Button>
