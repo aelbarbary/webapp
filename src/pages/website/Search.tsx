@@ -126,19 +126,6 @@ export default function Search() {
                             const data = JSON.parse(line);
                             if (data.answer) {
                                 processAnswer(data.answer);
-
-                                // accumulatedAnswer += data.answer;
-
-                                // setMessages(prevMessages => {
-                                //     const updatedMessages = [...prevMessages];
-                                //     updatedMessages.pop(); // Remove the typing indicator
-                                //     updatedMessages.push({
-                                //         type: 'string',
-                                //         content: accumulatedAnswer,
-                                //         sender: 'bot',
-                                //     });
-                                //     return updatedMessages;
-                                // });
                             }
                         } catch (e) {
                             console.error('Error parsing JSON:', e);
