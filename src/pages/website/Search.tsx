@@ -11,10 +11,14 @@ import {
     List,
     ListItem,
     ListItemText,
+    Drawer,
+    Slider,
+    IconButton,
 } from '@mui/material';
 import axios from 'axios';
 import RenderedMessageContent from './RenderedMessageContent';
 import TypingIndicator from './TypingIndicator';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 const api_url = import.meta.env.VITE_API_URL;
 
@@ -25,6 +29,11 @@ interface Message {
 }
 
 export default function Search() {
+    const [drawerOpen, setDrawerOpen] = useState(false); // State to manage Drawer visibility
+    const [limit, setLimit] = useState(20); // Query param state
+    const [metadataFilter, setMetadataFilter] = useState(''); // Query param state
+    const [lexicalInterpolation, setLexicalInterpolation] = useState<number>(1); // Slider for lexical interpolation
+
     const [question, setQuestion] = useState<string>('');
     const [messages, setMessages] = useState<Message[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
@@ -32,6 +41,19 @@ export default function Search() {
     const theme = useTheme();
 
     let accumulatedAnswer = '';
+
+    const toggleDrawer =
+        (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
+            // Type narrowing: Check if it's a KeyboardEvent before accessing 'key'
+            if (
+                (event.type === 'keydown' &&
+                    (event as React.KeyboardEvent).key === 'Tab') ||
+                (event as React.KeyboardEvent).key === 'Shift'
+            ) {
+                return;
+            }
+            setDrawerOpen(open);
+        };
 
     function processAnswer(answer: any) {
         console.log(answer);
@@ -106,12 +128,22 @@ export default function Search() {
         });
 
         try {
+            const query_params = {
+                limit: limit,
+                metadata_filter: metadataFilter,
+                stream_response: true,
+                lexical_interpolation: lexicalInterpolation,
+            };
+
             const responseStream = await fetch(api_url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ prompt: question }),
+                body: JSON.stringify({
+                    prompt: question,
+                    query_params: query_params,
+                }),
             });
 
             const reader = responseStream.body?.getReader();
@@ -173,14 +205,95 @@ export default function Search() {
                 alignItems: 'center', // Optional: Center content vertically
             }}
         >
+            <Drawer
+                anchor="right"
+                open={drawerOpen}
+                onClose={toggleDrawer(false)}
+                sx={{ padding: 4, spacing: 10, m: 5 }}
+            >
+                <div style={{ width: 300, padding: 40, marginTop: 50 }}>
+                    <Typography variant="h6" sx={{ mb: 2 }}>
+                        Query Parameters
+                    </Typography>
+
+                    {/* Limit input */}
+                    <Typography gutterBottom>Limit</Typography>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        label="Limit"
+                        type="number"
+                        value={limit}
+                        onChange={e => setLimit(Number(e.target.value))}
+                        sx={{ mb: 2 }}
+                    />
+
+                    {/* Metadata Filter input */}
+                    <Typography gutterBottom>Metadata Filter</Typography>
+                    <TextField
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        variant="outlined"
+                        label="Metadata Filter"
+                        value={metadataFilter}
+                        onChange={e => setMetadataFilter(e.target.value)}
+                    />
+
+                    <Typography gutterBottom>Lexical Interpolation</Typography>
+                    <TextField
+                        type="number"
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        inputProps={{
+                            step: 0.1, // Allows fractional input with step 0.1
+                            min: 0,
+                            max: 2,
+                        }}
+                        value={lexicalInterpolation}
+                        onChange={e => {
+                            const newValue = parseFloat(e.target.value);
+                            if (
+                                !isNaN(newValue) &&
+                                newValue >= 0 &&
+                                newValue <= 2
+                            ) {
+                                setLexicalInterpolation(newValue);
+                            }
+                        }}
+                        label="Enter a value between 0 and 2"
+                        variant="outlined"
+                    />
+                    <Button variant="contained" onClick={toggleDrawer(false)}>
+                        Apply
+                    </Button>
+                </div>
+            </Drawer>
+
             <Paper
                 sx={{
                     display: 'flex',
                     width: '100%',
                     flexDirection: 'column',
                     padding: 2,
+                    position: 'relative',
                 }}
             >
+                <IconButton
+                    edge="end"
+                    color="inherit"
+                    onClick={toggleDrawer(true)}
+                    aria-label="menu"
+                    sx={{
+                        width: '50px',
+                        position: 'fixed', // Use fixed positioning
+                        bottom: 20, // 20px from the bottom
+                        right: 20, // 20px from the right
+                        zIndex: 1000, // Ensure it is on top of other components
+                    }}
+                >
+                    <SettingsIcon />
+                </IconButton>
+
                 <Typography variant="h5" align="center" gutterBottom>
                     What do you want to know/do?
                 </Typography>
@@ -233,6 +346,7 @@ export default function Search() {
                     ))}
                     <div ref={endOfMessagesRef} />
                 </List>
+
                 <TextField
                     fullWidth
                     variant="outlined"
