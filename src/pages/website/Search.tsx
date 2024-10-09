@@ -70,10 +70,10 @@ export default function Search() {
         accumulatedAnswer += answer;
         setMessages(prevMessages => {
             const updatedMessages = [...prevMessages];
-            updatedMessages.pop(); // Remove the typing indicator
+            updatedMessages.pop();
             updatedMessages.push({
                 type: 'string',
-                content: accumulatedAnswer, // Pass the regular answer
+                content: accumulatedAnswer,
                 sender: 'bot',
             });
             return updatedMessages;
@@ -82,6 +82,8 @@ export default function Search() {
 
     const handleSend = async () => {
         if (!question.trim()) return;
+
+        accumulatedAnswer = '';
 
         const userMessage: Message = {
             type: 'string',
