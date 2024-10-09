@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { createTheme } from '@mui/material/styles';
+import { createTheme, useTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import HistoryIcon from '@mui/icons-material/History';
 import { AppProvider } from '@toolpad/core/AppProvider';
@@ -23,6 +23,7 @@ interface DemoProps {
 }
 
 export default function DashboardLayoutBranding(props: DemoProps) {
+    const theme = useTheme();
     return (
         <AppProvider
             navigation={NAVIGATION}
@@ -30,6 +31,7 @@ export default function DashboardLayoutBranding(props: DemoProps) {
                 logo: <img src={logo} alt="Ticketing" />,
                 title: 'Ticket AI',
             }}
+            theme={theme}
         >
             <DashboardLayout>
                 <Outlet />

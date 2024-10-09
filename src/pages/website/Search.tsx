@@ -90,6 +90,8 @@ export default function Search() {
             content: question,
             sender: 'user',
         };
+
+        setQuestion('');
         setMessages(prevMessages => [...prevMessages, userMessage]);
         setLoading(true);
         setMessages(prevMessages => {
@@ -162,83 +164,99 @@ export default function Search() {
     }, [messages]);
 
     return (
-        <Paper
-            sx={{
-                height: '100vh',
-                display: 'flex',
-                flexDirection: 'column',
-                padding: 8,
+        <div
+            style={{
+                height: '100%', // Full viewport height
+                width: '100%',
+                display: 'flex', // Optional: Flexbox layout
+                justifyContent: 'center', // Optional: Center content horizontally
+                alignItems: 'center', // Optional: Center content vertically
             }}
         >
-            <Typography variant="h5" align="center" gutterBottom>
-                What do you want to know/do?
-            </Typography>
-            <List sx={{ flexGrow: 1, overflowY: 'auto', marginBottom: '16px' }}>
-                {messages.map((message, index) => (
-                    <ListItem
-                        key={index}
-                        style={{
-                            justifyContent:
-                                message.sender === 'user'
-                                    ? 'flex-end'
-                                    : 'flex-start',
-                        }}
-                    >
-                        <ListItemText
-                            primary={
-                                message.type === 'component' ? (
-                                    message.content
-                                ) : (
-                                    <RenderedMessageContent
-                                        content={message.content as string}
-                                    />
-                                )
-                            }
-                            style={{
-                                backgroundColor:
-                                    message.sender === 'user'
-                                        ? theme.palette.grey[700]
-                                        : theme.palette.grey[900],
-                                color:
-                                    message.sender === 'user'
-                                        ? 'white'
-                                        : 'white',
-                                borderRadius: '10px',
-                                padding: '8px',
-                                maxWidth: '70%',
-                                textAlign:
-                                    message.sender === 'user'
-                                        ? 'right'
-                                        : 'left',
-                            }}
-                        />
-                    </ListItem>
-                ))}
-                <div ref={endOfMessagesRef} />
-            </List>
-            <TextField
-                fullWidth
-                variant="outlined"
-                label="Ask a question..."
-                value={question}
-                onChange={e => setQuestion(e.target.value)}
-                onKeyPress={e => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        handleSend();
-                    }
+            <Paper
+                sx={{
+                    display: 'flex',
+                    width: '100%',
+                    flexDirection: 'column',
+                    padding: 2,
                 }}
-                multiline
-            />
-            <Button
-                variant="contained"
-                color="primary"
-                onClick={handleSend}
-                style={{ marginTop: '10px' }}
-                disabled={loading}
             >
-                {loading ? 'Sending...' : 'Send'}
-            </Button>
-        </Paper>
+                <Typography variant="h5" align="center" gutterBottom>
+                    What do you want to know/do?
+                </Typography>
+                <List
+                    sx={{
+                        flexGrow: 1,
+                        overflowY: 'auto',
+                        marginBottom: '16px',
+                    }}
+                >
+                    {messages.map((message, index) => (
+                        <ListItem
+                            key={index}
+                            style={{
+                                justifyContent:
+                                    message.sender === 'user'
+                                        ? 'flex-end'
+                                        : 'flex-start',
+                            }}
+                        >
+                            <ListItemText
+                                primary={
+                                    message.type === 'component' ? (
+                                        message.content
+                                    ) : (
+                                        <RenderedMessageContent
+                                            content={message.content as string}
+                                        />
+                                    )
+                                }
+                                style={{
+                                    backgroundColor:
+                                        message.sender === 'user'
+                                            ? theme.palette.grey[700]
+                                            : theme.palette.grey[900],
+                                    color:
+                                        message.sender === 'user'
+                                            ? 'white'
+                                            : 'white',
+                                    borderRadius: '10px',
+                                    padding: '8px',
+                                    maxWidth: '70%',
+                                    textAlign:
+                                        message.sender === 'user'
+                                            ? 'right'
+                                            : 'left',
+                                }}
+                            />
+                        </ListItem>
+                    ))}
+                    <div ref={endOfMessagesRef} />
+                </List>
+                <TextField
+                    fullWidth
+                    variant="outlined"
+                    label="Ask a question..."
+                    value={question}
+                    onChange={e => setQuestion(e.target.value)}
+                    onKeyPress={e => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            handleSend();
+                        }
+                    }}
+                    multiline
+                />
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleSend}
+                    style={{ marginTop: '10px' }}
+                    disabled={loading}
+                >
+                    {loading ? 'Sending...' : 'Send'}
+                </Button>
+            </Paper>
+        </div>
     );
 }

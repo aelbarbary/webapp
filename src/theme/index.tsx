@@ -1,19 +1,28 @@
-import { useMemo } from 'react'
-import { CssBaseline } from '@mui/material'
-import { ThemeProvider as MUIThemeProvider, createTheme, StyledEngineProvider } from '@mui/material/styles'
-import palette from './palette'
-import componentsOverride from './overrides'
-import shadows, { customShadows } from './shadows'
+import { useMemo } from 'react';
+import { CssBaseline } from '@mui/material';
+import {
+    ThemeProvider as MUIThemeProvider,
+    createTheme,
+    StyledEngineProvider,
+} from '@mui/material/styles';
+import palette from './palette';
+import componentsOverride from './overrides';
+import shadows, { customShadows } from './shadows';
 
 interface ThemeProps {
-    children: React.ReactNode
+    children: React.ReactNode;
 }
 
 export default function ThemeProvider({ children }: ThemeProps) {
     const themeOptions = useMemo(
         () => ({
-            palette,
+            // palette,
+
             shape: { borderRadius: 8 },
+            cssVariables: {
+                colorSchemeSelector: 'data-toolpad-color-scheme',
+            },
+            colorSchemes: { dark: true },
             typography: {
                 fontFamily: '"Montserrat", "Helvetica", "Arial", sans-serif',
                 h2: {
@@ -25,10 +34,10 @@ export default function ThemeProvider({ children }: ThemeProps) {
             customShadows,
         }),
         []
-    )
+    );
 
-    const theme = createTheme(themeOptions)
-    theme.components = componentsOverride(theme)
+    const theme = createTheme(themeOptions);
+    theme.components = componentsOverride(theme);
 
     return (
         <StyledEngineProvider injectFirst>
@@ -37,5 +46,5 @@ export default function ThemeProvider({ children }: ThemeProps) {
                 {children}
             </MUIThemeProvider>
         </StyledEngineProvider>
-    )
+    );
 }
