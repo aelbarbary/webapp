@@ -11,11 +11,11 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { Outlet, useLocation } from 'react-router-dom';
 import SearchIcon from '@mui/icons-material/Search';
 import { height } from '@mui/system';
+import FileOpenIcon from '@mui/icons-material/FileOpen';
 
 const NAVIGATION: Navigation = [
     { segment: 'search', title: 'Search', icon: <SearchIcon /> },
-    { segment: 'history', title: 'History', icon: <HistoryIcon /> },
-    { segment: 'upload', title: 'Upload', icon: <CloudUploadIcon /> },
+    { segment: 'Convert', title: 'File Converter', icon: <FileOpenIcon /> },
 ];
 
 interface DemoProps {

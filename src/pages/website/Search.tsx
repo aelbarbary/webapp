@@ -284,10 +284,11 @@ export default function Search() {
                     onClick={toggleDrawer(true)}
                     aria-label="menu"
                     sx={{
-                        width: '50px',
+                        width: '80px',
+                        height: '80px',
                         position: 'fixed', // Use fixed positioning
-                        bottom: 20, // 20px from the bottom
-                        right: 20, // 20px from the right
+                        bottom: 30, // 20px from the bottom
+                        right: 30, // 20px from the right
                         zIndex: 1000, // Ensure it is on top of other components
                     }}
                 >
