@@ -1,13 +1,12 @@
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import History from './website/FileConverter';
-import Upload from './website/Upload';
+import Converter from './website/FileConverter';
+
 import Search from './website/Search';
 
 const routeConfig: Record<string, React.ComponentType> = {
     '/search': Search,
-    '/history': History,
-    '/upload': Upload,
+    '/convert': Converter,
 };
 
 export default function ContentPage({ pathname }: { pathname: string }) {
